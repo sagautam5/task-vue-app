@@ -11,7 +11,9 @@
 |
 */
 
-Route::resource('tasks', 'TasksController', ['except' => ['create', 'edit']]);
+Route::group(['prefix' => 'api'], function (){
+    Route::resource('tasks', 'TasksController', ['except' => ['create', 'edit']]);
+});
 
 Route::get('/', function () {
     return view('welcome');

@@ -28,7 +28,7 @@ class TasksController extends Controller
             $query = $query->whereDate('date', $date);
         }
 
-        return $query->select('id', 'title', 'date', 'is_completed')->get();
+        return $query->get();
     }
 
     /**
@@ -39,8 +39,14 @@ class TasksController extends Controller
      */
     public function store(Request $request)
     {
-        Task::create($request->only(['date', 'title']));
-        return response()->json(['message' => 'Success'], 200);
+        $request = json_decode(file_get_contents("php://input"), true);
+
+        $input = array_filter($request, function ($key){
+            return in_array($key, ['date', 'title']);
+        }, ARRAY_FILTER_USE_KEY);
+
+        $task = Task::create($input);
+        return response()->json(['message' => 'Success', 'data' => $task], 200);
     }
 
     /**
@@ -51,7 +57,7 @@ class TasksController extends Controller
      */
     public function show($id)
     {
-        return Task::find($id);
+        return response()->json(['message' => 'Success', 'data' =>  Task::find($id)]);
     }
 
     /**
@@ -63,8 +69,14 @@ class TasksController extends Controller
      */
     public function update(Request $request, $id)
     {
-        Task::find($id)->update($request->only(['date', 'title', 'is_completed']));
-        return response()->json(['message' => 'Success'], 200);
+        $request = json_decode(file_get_contents("php://input"), true);
+
+        $input = array_filter($request, function ($key){
+            return in_array($key, ['date', 'title', 'is_completed']);
+        }, ARRAY_FILTER_USE_KEY);
+
+        Task::find($id)->update($input);
+        return response()->json(['message' => 'Success', 'data' => Task::find($id)], 200);
     }
 
     /**
